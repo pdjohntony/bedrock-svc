@@ -7,9 +7,16 @@ from bedrocksvc.logger import init_logger
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
+from flask_login import LoginManager
 from flask_session import Session
 from flask_debugtoolbar import DebugToolbarExtension
 from cryptography.fernet import Fernet
+
+"""
+TODO
+Clean up flask log messages
+	Rich might be messing these up
+"""
 
 parser = argparse.ArgumentParser(prog="bedrock-svc", description="Bedrock Svc - Web GUI for Minecraft Bedrock servers")
 parser.add_argument("-d", "--debug", action="store_true", help="Displays debug logs in the console")
@@ -43,6 +50,10 @@ bcrypt = Bcrypt(app) # for hashing not encryption
 crypt = Fernet(app.config['SECRET_KEY'])
 
 # toolbar = DebugToolbarExtension(app)
+
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+login_manager.login_message_category = 'info'
 
 Session(app)
 
