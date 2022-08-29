@@ -1,0 +1,11 @@
+python-dotenv
+rich
+cryptography
+flask
+flask-sqlalchemy
+flask-bcrypt
+flask-wtf
+flask-login
+flask-session
+flask-debugtoolbar
+requests
