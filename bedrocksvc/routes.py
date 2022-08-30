@@ -1,7 +1,7 @@
 import logging
 from flask import url_for, render_template, flash, redirect, request, session
 from flask_login import login_user, current_user, logout_user, login_required
-from bedrocksvc import app, db, bcrypt, crypt, session_data
+from bedrocksvc import app, db, bcrypt, crypt, session_data, BDSServer
 from bedrocksvc.models import User, Player, PlayerEvent
 from bedrocksvc.forms import RegistrationForm, LoginForm
 
@@ -14,7 +14,8 @@ TODO
 @app.route("/")
 @login_required
 def home():
-	return render_template("home.html")
+	bdsstatus = BDSServer.is_running()
+	return render_template("home.html", bdsstatus=bdsstatus)
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
@@ -59,3 +60,31 @@ def logout():
 	logger.info(f"User '{User.query.get(current_user.get_id())}' manually logged out.")
 	logout_user()
 	return redirect(url_for('login'))
+
+# def shutdown_server():
+# 	func = request.environ.get('werkzeug.server.shutdown')
+# 	if func is None:
+# 		raise RuntimeError('Not running with the Werkzeug Server')
+# 	func()
+
+@app.route("/startup")
+@login_required
+def startup():
+	logger.info(f"User '{User.query.get(current_user.get_id())}' initiated startup.")
+	BDSServer.start_server()
+	flash('Bedrock server started!', 'success')
+	return redirect(url_for('home'))
+
+@app.route("/shutdown")
+@login_required
+def shutdown():
+	logger.info(f"User '{User.query.get(current_user.get_id())}' initiated shutdown.")
+	# func = request.environ.get('werkzeug.server.shutdown')
+	# if func is None:
+	# 	logger.error(f"Not running with the Werkzeug Server")
+	# 	flash('Not running with the Werkzeug Server', 'danger')
+	# 	return redirect(url_for('home'))
+	# func()
+	BDSServer.stop_server()
+	flash('Bedrock server shutdown!', 'success')
+	return redirect(url_for('home'))

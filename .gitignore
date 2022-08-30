@@ -17,6 +17,7 @@ keys.py
 flask_session/
 -*.bat
 test*.py
+bedrock_server/
 
 # Compiled source #
 ###################

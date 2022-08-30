@@ -11,6 +11,8 @@ from flask_login import LoginManager
 from flask_session import Session
 from flask_debugtoolbar import DebugToolbarExtension
 from cryptography.fernet import Fernet
+from bedrocksvc.bds import BDSServer
+import atexit
 
 """
 TODO
@@ -60,9 +62,22 @@ Session(app)
 global session_data
 session_data = {}
 
-from bedrocksvc import routes # needed to bring routes to app
-
 # create db if none exists
 if not os.path.isfile(os.path.join(cwd, db_name)):
 	db.create_all()
 	logger.debug(f"'{db_name}' created")
+
+def OnExitApp():
+	print(f"OnExitApp() {__name__}")
+	# BDSServer.send_input("stop")
+
+# if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+#   # The reloader has already run - do what you want to do here
+
+if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+	# The app is not in debug mode or we are in the reloaded process
+	BDSServer = BDSServer()
+	BDSServer.start_server()
+	atexit.register(OnExitApp)
+
+from bedrocksvc import routes # needed to bring routes to app
