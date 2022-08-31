@@ -1,6 +1,12 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="content-section" id="mainSection">
-	
+	<div class="mb-2">
+		<button id="bds-pwr-btn" class="btn" type="submit" disabled>?</button>
+	</div>
+	<div class="mb-2">
+		<label for="bds-log-text" class="form-label">Bedrock Server Log</label>
+		<textarea class="form-control" id="bds-log-text" rows="14" disabled></textarea>
+	</div>
 </div>
 {% endblock content %}

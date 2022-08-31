@@ -5,8 +5,18 @@ import threading
 from threading import Lock
 from pathlib import Path
 import atexit
+from bedrocksvc import socketio, send, emit
 
 logger = logging.getLogger(__name__)
+
+# @socketio.on('admin connect')
+# def handle_my_custom_event(json):
+# 	logger.debug('Socket received json: ' + str(json))
+# 	emit('log msg', {'data':'Connected...'})
+
+# # @socketio.send
+# def modulesend(x):
+# 	send({'data':x}, broadcast=True)
 
 class BDS_Wrapper(subprocess.Popen):
 	def __init__(self, exec_path, **kwargs):
@@ -70,6 +80,7 @@ class BDSServer:
 	def write_console(self, text):
 		"""Writes a message to console."""
 		logger.info(f"BDS {text.strip()}")
+		socketio.emit('bds-log-msg', {'data':text.strip()})
 	
 	def __interpret(self, message):
 		"""Reads input from the server or user and calls listeners."""
@@ -100,6 +111,7 @@ class BDSServer:
 			return False
 		return True
 	
+	#! stop only works once
 	def stop_server(self, post_stop = None, *args):
 		# This is a really ugly function.
 		MAX_WAIT_DEPTH = 15 # Maximum number of WAIT_INTERVAL to wait.

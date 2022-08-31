@@ -11,9 +11,9 @@ from flask_login import LoginManager
 from flask_session import Session
 from flask_debugtoolbar import DebugToolbarExtension
 from cryptography.fernet import Fernet
-from bedrocksvc.bds import BDSServer
 from bedrocksvc.flasklog import modify_flask_logs
 import atexit
+from flask_socketio import SocketIO, send, emit, disconnect
 
 """
 TODO
@@ -53,6 +53,8 @@ db = SQLAlchemy(app)
 bcrypt = Bcrypt(app) # for hashing not encryption
 crypt = Fernet(app.config['SECRET_KEY'])
 
+socketio = SocketIO(app, logger=False, engineio_logger=False)
+
 # toolbar = DebugToolbarExtension(app)
 
 login_manager = LoginManager(app)
@@ -78,8 +80,12 @@ def OnExitApp():
 
 if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
 	# The app is not in debug mode or we are in the reloaded process
-	BDSServer = BDSServer()
-	BDSServer.start_server()
-	atexit.register(OnExitApp)
+	# atexit.register(OnExitApp)
+	pass
 
-from bedrocksvc import routes # needed to bring routes to app
+from bedrocksvc.bds import BDSServer # import bds after socketio
+BDSServer = BDSServer()
+# # BDSServer.start_server()
+
+from bedrocksvc import routes        # import routes after app
+from bedrocksvc import socketevents  # import socketevents after app
