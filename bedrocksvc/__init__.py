@@ -12,6 +12,7 @@ from flask_session import Session
 from flask_debugtoolbar import DebugToolbarExtension
 from cryptography.fernet import Fernet
 from bedrocksvc.bds import BDSServer
+from bedrocksvc.flasklog import modify_flask_logs
 import atexit
 
 """
@@ -28,6 +29,7 @@ parser.add_argument("-p", "--port", type=int, default=5001, help="Specify custom
 args = parser.parse_args()
 
 logger = init_logger(console_debug_lvl=Config.LOG_LEVEL_CONSOLE, retention_days=Config.LOG_RETENTION)
+modify_flask_logs()
 
 cwd = os.path.abspath(os.path.dirname(os.path.abspath(__name__)))
 

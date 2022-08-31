@@ -7,8 +7,6 @@ import datetime
 import traceback
 from rich import print
 from rich.logging import RichHandler
-from werkzeug import serving
-import re
 
 """
 In entrypoint/main module call `init_logger`. This will return the root logger.
@@ -102,7 +100,6 @@ def init_logger(console_debug_lvl=False, retention_days=180):
 		logger.addHandler(log_console_handler)
 		
 		purge_files(retention_days)
-		disable_endpoint_logs()
 		return logger
 	except IOError as e:
 		errOut = "** ERROR: Unable to create or open log file %s" % log_file_name
@@ -135,19 +132,3 @@ def purge_files(retention_days=180, file_dir="logs", file_ext=".log"):
 						logger.debug(f"{file} has been deleted")
 	except Exception as e:
 		logger.error(f"File purge error: {e}")
-
-def disable_endpoint_logs():
-	"""Disable logs for requests to specific endpoints."""
-
-	logger = logging.getLogger()
-	disabled_endpoints = ('.*\.css', '.*\.js')
-	parent_log_request = serving.WSGIRequestHandler.log_request
-
-	def log_request(self, *args, **kwargs):
-		# print(self.path)
-		if not any(re.match(f"{de}$", self.path) for de in disabled_endpoints):
-			# parent_log_request(self, *args, **kwargs)
-			# really jank way of customizing the Flask logs, removing duplicate datetime
-			logger.info(f"{self.client_address[0]} - {self.command} - {self.path}")
-
-	serving.WSGIRequestHandler.log_request = log_request
