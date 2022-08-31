@@ -18,6 +18,7 @@ flask_session/
 -*.bat
 test*.py
 bedrock_server/
+references.txt
 
 # Compiled source #
 ###################
