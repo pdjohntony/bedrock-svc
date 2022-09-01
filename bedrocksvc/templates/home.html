@@ -33,7 +33,8 @@
 
 		// Send connected msg to socket server
 		socket.on('connect', function() {
-				socket.emit('admin-connect', {data: 'Admin connected!'});
+			$('#bds-log-text').empty();
+			socket.emit('admin-connect', {data: 'Admin connected!'});
 				$('#bds-pause-btn').removeAttr("disabled");
 		});
 
