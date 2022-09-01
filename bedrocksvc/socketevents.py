@@ -34,7 +34,7 @@ def admin_connect(json):
 def bds_status():
 	bdsstatus = BDSServer.is_running()
 	emit('bds-status', {'data':bdsstatus})
-	logger.debug(f"Socket sent: bds-status - data: {bdsstatus}")
+	# logger.debug(f"Socket sent: bds-status - data: {bdsstatus}")
 
 @socketio.on('bds-startup')
 @authenticated_only

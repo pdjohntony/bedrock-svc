@@ -4,7 +4,7 @@
 	<h4>Bedrock Server Controls</h4>
 	<div class="mb-2">
 		<button id="bds-pwr-btn" class="btn btn-success me-2" type="submit" disabled>Startup</button>
-		<button id="bds-pause-btn" class="btn btn-warning me-2" type="submit" disabled>Pause</button>
+		<button id="bds-pause-btn" class="btn btn-warning me-2" type="submit" disabled>Pause Refresh</button>
 	</div>
 	
 	<div class="mb-2">
@@ -84,12 +84,12 @@
 
 		// BDS status pause button click
 		$('#bds-pause-btn').click(function(){
-			if ($('#bds-pause-btn').text() == 'Pause') {
+			if ($('#bds-pause-btn').text() == 'Pause Refresh') {
 				bds_status_refresh = false
-				$('#bds-pause-btn').text('Unpause');
+				$('#bds-pause-btn').text('Unpause Refresh');
 			} else {
 				bds_status_refresh = true
-				$('#bds-pause-btn').text('Pause');
+				$('#bds-pause-btn').text('Pause Refresh');
 			}
 		});
 
