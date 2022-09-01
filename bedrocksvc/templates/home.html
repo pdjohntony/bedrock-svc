@@ -1,14 +1,14 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="content-section" id="mainSection">
+	<h4>Bedrock Server Controls</h4>
 	<div class="mb-2">
-		<button id="bds-pwr-btn" class="btn" type="submit" disabled>?</button>
-		Loading wheel
-		<button id="bds-pause-btn" class="btn btn-primary" type="submit" disabled>Pause</button>
+		<button id="bds-pwr-btn" class="btn btn-success me-2" type="submit" disabled>Startup</button>
+		<button id="bds-pause-btn" class="btn btn-warning me-2" type="submit" disabled>Pause</button>
 	</div>
 	
 	<div class="mb-2">
-		<label for="bds-log-text" class="form-label">Bedrock Server Log</label>
+		<!-- <label for="bds-log-text" class="form-label">Bedrock Server Controls</label> -->
 		<textarea class="form-control" id="bds-log-text" rows="14" disabled></textarea>
 	</div>
 </div>
@@ -18,11 +18,25 @@
 	<script type="text/javascript" charset="utf-8">
 		var socket = io();
 		var bds_status = null
+		var bds_status_refresh = true
 
-		socket.on('connect', function() {
-				socket.emit('admin-connect', {data: 'Admin connected!'});
+		// On DOM ready
+		$(document).ready(function(){
+			// Every 5 sec
+			setInterval(function() {
+				if (bds_status_refresh == true) {
+					socket.emit('bds-status');
+				}
+			}, 5000)
 		});
 
+		// Send connected msg to socket server
+		socket.on('connect', function() {
+				socket.emit('admin-connect', {data: 'Admin connected!'});
+				$('#bds-pause-btn').removeAttr("disabled");
+		});
+
+		// BDS status + power button status
 		socket.on('bds-status', function(msg) {
 			//$('#bds-log-text').append('Server Status: '+msg.data+'\n');
 			
@@ -45,27 +59,34 @@
 			bds_status = msg.data
 		});
 
+		// Receive BDS Log Messages
 		socket.on('bds-log-msg', function(msg) {
 			$('#bds-log-text').append(msg.data+'\n');
 			$('#bds-log-text').scrollTop($('#bds-log-text')[0].scrollHeight);
 		});
 
-		$(document).ready(function(){
-			setInterval(function() {
-				socket.emit('bds-status');
-			}, 5000) // 5 sec
-		});
-
-		$("#bds-pwr-btn").click(function(){
+		// BDS power button click
+		$('#bds-pwr-btn').click(function(){
 			$('#bds-pwr-btn').attr('disabled', 'disabled');
 			if ($('#bds-pwr-btn').text() == 'Startup') {
 				socket.emit('bds-startup', {data: 'startup'});
 			} else {
 				socket.emit('bds-shutdown', {data: 'shutdown'});
 			}
-
-			//$(this).addClass("disabled");
-			//$("#spinner_connect").css("opacity",100);
 		});
+
+		// BDS status pause button click
+		$('#bds-pause-btn').click(function(){
+			if ($('#bds-pause-btn').text() == 'Pause') {
+				bds_status_refresh = false
+				$('#bds-pause-btn').text('Unpause');
+			} else {
+				bds_status_refresh = true
+				$('#bds-pause-btn').text('Pause');
+			}
+		});
+
+		//$(this).addClass("disabled");
+		//$("#spinner_connect").css("opacity",100);
 	</script>
 {% endblock scripts %}
