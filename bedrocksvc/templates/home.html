@@ -3,10 +3,69 @@
 <div class="content-section" id="mainSection">
 	<div class="mb-2">
 		<button id="bds-pwr-btn" class="btn" type="submit" disabled>?</button>
+		Loading wheel
+		<button id="bds-pause-btn" class="btn btn-primary" type="submit" disabled>Pause</button>
 	</div>
+	
 	<div class="mb-2">
 		<label for="bds-log-text" class="form-label">Bedrock Server Log</label>
 		<textarea class="form-control" id="bds-log-text" rows="14" disabled></textarea>
 	</div>
 </div>
 {% endblock content %}
+{% block scripts %}
+	<script src="{{ url_for('static', filename='socket.io.js') }}"></script>
+	<script type="text/javascript" charset="utf-8">
+		var socket = io();
+		var bds_status = null
+
+		socket.on('connect', function() {
+				socket.emit('admin-connect', {data: 'Admin connected!'});
+		});
+
+		socket.on('bds-status', function(msg) {
+			//$('#bds-log-text').append('Server Status: '+msg.data+'\n');
+			
+			$('#bds-pwr-btn').removeAttr("disabled");
+			if (msg.data != bds_status) {
+				if (msg.data == true) {
+					$('#bds-pwr-btn').text('Shutdown');
+					$('#bds-pwr-btn').addClass('btn-danger');
+					if ($('#bds-pwr-btn').hasClass('btn-success')) {
+						$('#bds-pwr-btn').removeClass('btn-success');
+					}
+				} else {
+					$('#bds-pwr-btn').text('Startup');
+					$('#bds-pwr-btn').addClass('btn-success');
+					if ($('#bds-pwr-btn').hasClass('btn-danger')) {
+						$('#bds-pwr-btn').removeClass('btn-danger');
+					}
+				}
+			}
+			bds_status = msg.data
+		});
+
+		socket.on('bds-log-msg', function(msg) {
+			$('#bds-log-text').append(msg.data+'\n');
+			$('#bds-log-text').scrollTop($('#bds-log-text')[0].scrollHeight);
+		});
+
+		$(document).ready(function(){
+			setInterval(function() {
+				socket.emit('bds-status');
+			}, 5000) // 5 sec
+		});
+
+		$("#bds-pwr-btn").click(function(){
+			$('#bds-pwr-btn').attr('disabled', 'disabled');
+			if ($('#bds-pwr-btn').text() == 'Startup') {
+				socket.emit('bds-startup', {data: 'startup'});
+			} else {
+				socket.emit('bds-shutdown', {data: 'shutdown'});
+			}
+
+			//$(this).addClass("disabled");
+			//$("#spinner_connect").css("opacity",100);
+		});
+	</script>
+{% endblock scripts %}

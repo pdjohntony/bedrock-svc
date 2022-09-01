@@ -28,6 +28,8 @@
 				<div class="collapse navbar-collapse" id="navbarToggle">
 					<div class="navbar-nav me-auto">
 						<a class="nav-item nav-link" href="{{ url_for('home') }}">Home</a>
+						<a class="nav-item nav-link" href="{{ url_for('home') }}">Schedule</a>
+						<a class="nav-item nav-link" href="{{ url_for('home') }}">Database</a>
 					</div>
 					<div class="navbar-nav">
 						{% if current_user.is_authenticated %}
@@ -69,62 +71,6 @@
 	<script src="{{ url_for('static', filename='bootstrap/js/bootstrap.bundle.js') }}"></script>
 	<script src="{{ url_for('static', filename='jquery-3.6.0.js') }}"></script>
 	<script src="{{ url_for('static', filename='htmx.js') }}"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
-	<script type="text/javascript" charset="utf-8">
-		var socket = io();
-		var bds_status = null
-
-		socket.on('connect', function() {
-				socket.emit('admin-connect', {data: 'Admin connected!'});
-		});
-
-		socket.on('bds-status', function(msg) {
-			//$('#bds-log-text').append('Server Status: '+msg.data+'\n');
-			
-			$('#bds-pwr-btn').removeAttr("disabled");
-			if (msg.data != bds_status) {
-				if (msg.data == true) {
-					$('#bds-pwr-btn').text('Shutdown');
-					$('#bds-pwr-btn').addClass('btn-danger');
-					if ($('#bds-pwr-btn').hasClass('btn-success')) {
-						$('#bds-pwr-btn').removeClass('btn-success');
-					}
-				} else {
-					$('#bds-pwr-btn').text('Startup');
-					$('#bds-pwr-btn').addClass('btn-success');
-					if ($('#bds-pwr-btn').hasClass('btn-danger')) {
-						$('#bds-pwr-btn').removeClass('btn-danger');
-					}
-				}
-			}
-			bds_status = msg.data
-		});
-
-		socket.on('bds-log-msg', function(msg) {
-			$('#bds-log-text').append(msg.data+'\n');
-			$('#bds-log-text').scrollTop($('#bds-log-text')[0].scrollHeight);
-		});
-
-		setInterval(function() {
-			socket.emit('bds-status');
-		}, 5000) // 5 sec
-
-		$("#bds-pwr-btn").click(function(){
-			$('#bds-pwr-btn').attr('disabled', 'disabled');
-			if ($('#bds-pwr-btn').text() == 'Startup') {
-				socket.emit('bds-startup', {data: 'startup'});
-			} else {
-				socket.emit('bds-shutdown', {data: 'shutdown'});
-			}
-
-			//$(this).addClass("disabled");
-			//$("#spinner_connect").css("opacity",100);
-		});
-	</script>
-	<script>
-		$(document).ready(function(){
-			// Once page has loaded
-		});
-	</script>
+	{% block scripts %}{% endblock %}
 </body>
 </html>
