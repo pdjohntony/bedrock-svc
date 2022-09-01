@@ -80,7 +80,7 @@ class BDSServer:
 	
 	def write_console(self, text):
 		"""Writes a message to console."""
-		if len(self.log_history) > 20:
+		if len(self.log_history) >= 50:
 			self.log_history.pop(0)
 		self.log_history.append(text.strip())
 		logger.info(f"BDS {text.strip()}")
