@@ -1,5 +1,5 @@
 body {
-	/* background: #fafafa; */
+	background: #181a1b;
 	/* color: #333333; */
 	margin-top: 5rem;
  }
@@ -9,7 +9,7 @@ body {
  } */
  
  .bg-steel {
-	background-color: #b63030;
+	background-color: #1f2e4a;
  }
  
  .site-header .navbar-nav .nav-link {
@@ -27,10 +27,33 @@ body {
  /* background: #ffffff; */
  .content-section {
 	padding: 10px 20px;
-	border: 1px solid #515151;
+	border: 0px solid #515151;
 	border-radius: 3px;
 	margin-bottom: 20px;
  }
+
+ .form-control {
+	background-color: #333333;
+	color: #cccccc;
+	border: 0px;
+}
+
+.form-control:disabled {
+	background-color: #333333;
+	color: #cccccc;
+	border: 0px;
+}
+
+.form-control:focus {
+	background-color: #444444;
+	color: #cccccc;
+}
+
+.form-check-input {
+	background-color: #333333;
+	/* color: #cccccc;
+	border: 0px; */
+}
  
  .article-title {
 	color: #444444;
