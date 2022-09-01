@@ -118,15 +118,18 @@ class BDSServer:
 		WAIT_INTERVAL = 1000 # In ms.
 		this_lock = self.locks.stop
 		if not this_lock.acquire(False):
+			logger.debug("stop_server failed to acquire thread lock!")
 			return
 		if self.server_instance and self.server_instance.is_running():
 			self.message_user("Stopping server.")
 			self.send_input("stop")
 
 			def pause(action, depth, *args):
+				logger.debug("stop_server() pause()")
 				if depth > MAX_WAIT_DEPTH:
 					self.message_user("Server did not stop in time. Cancelling action.")
 					this_lock.release()
+					# logger.debug("Released thread lock!")
 					return
 				if self.server_instance and self.server_instance.is_running():
 					# Go another level.
@@ -135,11 +138,16 @@ class BDSServer:
 				else:
 					self.message_user("Server stop confirmed.")
 					this_lock.release()
+					# logger.debug("Released thread lock!")
 					action(*args)
 			if post_stop:
 				self.after(WAIT_INTERVAL, pause, post_stop, 0, *args)
+			else:
+				this_lock.release()
+				# logger.debug("Released thread lock!")
 		else:
 			this_lock.release()
+			# logger.debug("Released thread lock!")
 			if post_stop:
 				post_stop(*args)
 
