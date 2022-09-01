@@ -22,9 +22,13 @@ def authenticated_only(f):
 def admin_connect(json):
 	logger.debug(f"Socket received: {json}")
 	bdsstatus = BDSServer.is_running()
+	bdsloghistory = BDSServer.get_log_history()
+
 	emit('bds-log-msg', {'data':'Connected to log...'})
 	emit('bds-status', {'data':bdsstatus})
 	logger.debug(f"Socket sent: bds-status - data: {bdsstatus}")
+	for msg in bdsloghistory:
+		emit('bds-log-msg', {'data':msg})
 
 # def modulesend(x):
 # 	socketio.send({'data':x}, broadcast=True)

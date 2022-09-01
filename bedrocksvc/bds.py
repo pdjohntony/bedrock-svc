@@ -63,6 +63,7 @@ class BDSServer:
 		self.autoscroll_log = True # Might make this setting edit-able later.
 		self.locks = Locks()
 		self.log_listeners = set()
+		self.log_history = []
 
 	def bind_inputs(self, input_handler):
 		"""Specifies what function should handle user inputs from the command lines."""
@@ -79,8 +80,14 @@ class BDSServer:
 	
 	def write_console(self, text):
 		"""Writes a message to console."""
+		if len(self.log_history) > 20:
+			self.log_history.pop(0)
+		self.log_history.append(text.strip())
 		logger.info(f"BDS {text.strip()}")
 		socketio.emit('bds-log-msg', {'data':text.strip()})
+
+	def get_log_history(self):
+		return self.log_history
 	
 	def __interpret(self, message):
 		"""Reads input from the server or user and calls listeners."""
