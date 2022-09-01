@@ -49,3 +49,9 @@ def bds_shutdown(data):
 	logger.info(f"User '{current_user.username}' initiated shutdown.")
 	BDSServer.stop_server()
 	# BDSServer.write_console("PRETEND SHUTDOWN")
+
+@socketio.on('bds-send-input')
+@authenticated_only
+def bds_send_input(data):
+	logger.debug(f"Socket received: {data}")
+	BDSServer.send_input(data["command"])

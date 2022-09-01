@@ -9,7 +9,8 @@
 	
 	<div class="mb-2">
 		<!-- <label for="bds-log-text" class="form-label">Bedrock Server Controls</label> -->
-		<textarea class="form-control" id="bds-log-text" rows="14" disabled></textarea>
+		<textarea id="bds-log-text" class="form-control mb-2" rows="14" disabled></textarea>
+		<input id="bds-send-input" class="form-control form-control-md" type="text" placeholder="Send disabled, server not running" disabled>
 	</div>
 </div>
 {% endblock content %}
@@ -48,12 +49,18 @@
 					if ($('#bds-pwr-btn').hasClass('btn-success')) {
 						$('#bds-pwr-btn').removeClass('btn-success');
 					}
+
+					$('#bds-send-input').removeAttr("disabled");
+					$('#bds-send-input').attr('placeholder', 'Send');
 				} else {
 					$('#bds-pwr-btn').text('Startup');
 					$('#bds-pwr-btn').addClass('btn-success');
 					if ($('#bds-pwr-btn').hasClass('btn-danger')) {
 						$('#bds-pwr-btn').removeClass('btn-danger');
 					}
+
+					$('#bds-send-input').attr('disabled', 'disabled');
+					$('#bds-send-input').attr('placeholder', 'Send disabled, server not running');
 				}
 			}
 			bds_status = msg.data
@@ -83,6 +90,14 @@
 			} else {
 				bds_status_refresh = true
 				$('#bds-pause-btn').text('Pause');
+			}
+		});
+
+		// BDS send input
+		$('#bds-send-input').keypress(function(event){
+			if (event.keyCode == '13') {
+				socket.emit('bds-send-input', {command: $('#bds-send-input').val()});
+				$('#bds-send-input').val('')
 			}
 		});
 
