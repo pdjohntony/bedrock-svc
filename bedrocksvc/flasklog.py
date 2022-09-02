@@ -8,7 +8,7 @@ def modify_flask_logs():
 	"""Disable logs for requests to specific endpoints."""
 
 	logger = logging.getLogger()
-	disabled_endpoints = ('.*\.css', '.*\.js')
+	disabled_endpoints = ('.*\.css', '.*\.js', '.*\.map', '.*\.svg', '.*\.ico')
 	parent_log_request = serving.WSGIRequestHandler.log_request
 
 	def log_request(self, *args, **kwargs):
