@@ -20,13 +20,14 @@ def authenticated_only(f):
 @socketio.on('admin-connect')
 @authenticated_only
 def admin_connect(json):
-	logger.debug(f"Socket received: {json}")
-	bdsstatus = BDSServer.is_running()
+	logger.debug(f"Socket Rx: {json}")
+	bdsstatus = {'data': BDSServer.is_running()}
 	bdsloghistory = BDSServer.get_log_history()
 
 	emit('bds-log-msg', {'data':'Connected to log...'})
+	logger.debug("Socket Tx: bds-log-msg - {'data':'Connected to log...'}")
 	emit('bds-status', {'data':bdsstatus})
-	logger.debug(f"Socket sent: bds-status - data: {bdsstatus}")
+	logger.debug(f"Socket Tx: bds-status - {bdsstatus}")
 	for msg in bdsloghistory:
 		emit('bds-log-msg', {'data':msg})
 
@@ -36,13 +37,15 @@ def admin_connect(json):
 @socketio.on('bds-status')
 @authenticated_only
 def bds_status():
-	bdsstatus = BDSServer.is_running()
-	emit('bds-status', {'data':bdsstatus})
-	# logger.debug(f"Socket sent: bds-status - data: {bdsstatus}")
+	# logger.debug(f"Socket Rx: bds-status")
+	bdsstatus = {'data': BDSServer.is_running()}
+	emit('bds-status', bdsstatus)
+	# logger.debug(f"Socket Tx: bds-status - {bdsstatus}")
 
 @socketio.on('bds-startup')
 @authenticated_only
 def bds_startup(data):
+	logger.debug(f"Socket Rx: bds-startup - {data}")
 	logger.info(f"User '{current_user.username}' initiated startup.")
 	BDSServer.start_server()
 	# BDSServer.write_console("PRETEND STARTUP")
@@ -50,6 +53,7 @@ def bds_startup(data):
 @socketio.on('bds-shutdown')
 @authenticated_only
 def bds_shutdown(data):
+	logger.debug(f"Socket Rx: bds-shutdown - {data}")
 	logger.info(f"User '{current_user.username}' initiated shutdown.")
 	BDSServer.stop_server()
 	# BDSServer.write_console("PRETEND SHUTDOWN")
@@ -57,5 +61,5 @@ def bds_shutdown(data):
 @socketio.on('bds-send-input')
 @authenticated_only
 def bds_send_input(data):
-	logger.debug(f"Socket received: {data}")
+	logger.debug(f"Socket Rx: bds-send-input - {data}")
 	BDSServer.send_input(data["command"])
