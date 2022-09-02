@@ -16,6 +16,6 @@ def modify_flask_logs():
 		if not any(re.match(f"{de}$", self.path) for de in disabled_endpoints):
 			# parent_log_request(self, *args, **kwargs)
 			# really jank way of customizing the Flask logs, removing duplicate datetime
-			logger.info(f"{self.client_address[0]} - {self.command} - {self.path}")
+			logger.debug(f"{self.client_address[0]} - {self.command} - {self.path}")
 
 	serving.WSGIRequestHandler.log_request = log_request
