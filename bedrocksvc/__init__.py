@@ -1,6 +1,7 @@
 import _version as version
 import argparse
 import os
+import time
 from datetime import timedelta
 from bedrocksvc.config import Config
 from bedrocksvc.logger import init_logger
@@ -72,8 +73,10 @@ if not os.path.isfile(os.path.join(cwd, db_name)):
 	logger.debug(f"'{db_name}' created")
 
 def OnExitApp():
-	print(f"OnExitApp() {__name__}")
-	# BDSServer.send_input("stop")
+	logger.info(f"Checking BDS status before exiting...")
+	if BDSServer.is_running():
+		BDSServer.stop_server()
+		time.sleep(2)
 
 # if os.environ.get("WERKZEUG_RUN_MAIN") == "true":
 #   # The reloader has already run - do what you want to do here
@@ -85,6 +88,7 @@ if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
 
 from bedrocksvc.bds import BDSServer # import bds after socketio
 BDSServer = BDSServer()
+atexit.register(OnExitApp)
 # # BDSServer.start_server()
 
 from bedrocksvc import routes        # import routes after app

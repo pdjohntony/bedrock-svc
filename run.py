@@ -27,6 +27,6 @@ def OnExitApp():
 
 if __name__ == "__main__":
 	Timer(1, open_browser).start();
-	atexit.register(OnExitApp)
+	# atexit.register(OnExitApp)
 	# app.run(debug=args.debug, port=args.port) # use_reloader=False
 	socketio.run(app, debug=args.debug, port=args.port, use_reloader=False)
