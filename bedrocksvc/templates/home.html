@@ -5,12 +5,13 @@
 	<div class="mb-2">
 		<button id="bds-pwr-btn" class="btn btn-success me-2" type="submit" disabled>Startup</button>
 		<button id="bds-pause-btn" class="btn btn-warning me-2" type="submit" disabled>Pause Refresh</button>
+		Current Version: 0 - Latest Version: 0
 	</div>
 	
 	<div class="mb-2">
 		<!-- <label for="bds-log-text" class="form-label">Bedrock Server Controls</label> -->
 		<textarea id="bds-log-text" class="form-control mb-2" rows="14" disabled></textarea>
-		<input id="bds-send-input" class="form-control form-control-md" type="text" placeholder="Send disabled, server not running" disabled>
+		<input id="bds-send-input" class="form-control form-control-md mb-2" type="text" placeholder="Send disabled, server not running" disabled>
 	</div>
 </div>
 {% endblock content %}
@@ -129,4 +130,22 @@
 		//$(this).addClass("disabled");
 		//$("#spinner_connect").css("opacity",100);
 	</script>
+	<!-- ? autocomplete command, works but not great and interferes with command history up/down
+	? maybe use datatables.js instead with table of commands underneath send bar?
+	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='jquery-ui.css') }}">
+	<script src="{{ url_for('static', filename='jquery-ui.js') }}"></script>
+	<script type="text/javascript" charset="utf-8">
+		$(function() {
+			var availableCommands = [
+				"alwaysday",
+				"clear",
+				"say"
+			];
+			$("#bds-send-input").autocomplete({
+				source: availableCommands,
+				//appendTo: "#bds-send-input",
+				autoFocus: true
+			});
+		});
+	</script> -->
 {% endblock scripts %}
