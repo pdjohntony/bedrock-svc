@@ -12,6 +12,7 @@ from flask_login import LoginManager
 from flask_session import Session
 from flask_debugtoolbar import DebugToolbarExtension
 from cryptography.fernet import Fernet
+from flask_migrate import Migrate # flask db init, flask db migrate, flask db upgrade
 from bedrocksvc.flasklog import modify_flask_logs
 import atexit
 from flask_socketio import SocketIO, send, emit, disconnect
@@ -27,7 +28,7 @@ parser.add_argument("-d", "--debug", action="store_true", help="Displays debug l
 parser.add_argument("-p", "--port", type=int, default=5001, help="Specify custom port (default is 5001)")
 # parser.add_argument("-c", "--cli", action="store_true", help="Enables CLI only mode")
 # parser.add_argument("-t", "--test", action="store_true", help="Used for testing only")
-args = parser.parse_args()
+args, unknown = parser.parse_known_args()
 
 logger = init_logger(console_debug_lvl=Config.LOG_LEVEL_CONSOLE, retention_days=Config.LOG_RETENTION)
 modify_flask_logs()
@@ -50,6 +51,7 @@ db_name = f"{__name__}.db"
 app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(cwd, db_name)}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 bcrypt = Bcrypt(app) # for hashing not encryption
 crypt = Fernet(app.config['SECRET_KEY'])
@@ -66,11 +68,6 @@ Session(app)
 
 global session_data
 session_data = {}
-
-# create db if none exists
-if not os.path.isfile(os.path.join(cwd, db_name)):
-	db.create_all()
-	logger.debug(f"'{db_name}' created")
 
 def OnExitApp():
 	logger.info(f"Checking BDS status before exiting...")
@@ -93,3 +90,9 @@ atexit.register(OnExitApp)
 
 from bedrocksvc import routes        # import routes after app
 from bedrocksvc import socketevents  # import socketevents after app
+from bedrocksvc import models        # import models before db creation
+
+# create db if none exists
+if not os.path.isfile(os.path.join(cwd, db_name)):
+	db.create_all()
+	logger.debug(f"'{db_name}' created")
