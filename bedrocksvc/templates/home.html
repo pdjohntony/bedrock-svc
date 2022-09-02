@@ -14,10 +14,14 @@
 					</button>
 				</div>
 				<div class="row mb-2">
-					<button id="bds-pwr-btn" class="btn btn-success" type="submit" disabled>Startup</button>
+					<button id="bds-pwr-btn" class="fw-bold btn btn-success" type="submit" disabled>Start Server</button>
 				</div>
 				<div class="row mb-2">
-					<button id="bds-update-btn" class="btn btn-primary" type="submit" disabled>Check for update</button>
+					<button id="bds-update-btn" class="fw-bold btn btn-primary" type="submit" disabled>Check for update</button>
+				</div>
+				<div class="row mb-2">
+					Version<br>
+					Players
 				</div>
 			</div>
 			<div class="col">
@@ -82,7 +86,7 @@
 			$('#bds-pwr-btn').removeAttr("disabled");
 			if (msg.data != bds_status) {
 				if (msg.data == true) {
-					$('#bds-pwr-btn').text('Shutdown');
+					$('#bds-pwr-btn').text('Shutdown Server');
 					$('#bds-pwr-btn').addClass('btn-danger');
 					if ($('#bds-pwr-btn').hasClass('btn-success')) {
 						$('#bds-pwr-btn').removeClass('btn-success');
@@ -91,7 +95,7 @@
 					$('#bds-send-input').removeAttr("disabled");
 					$('#bds-send-input').attr('placeholder', 'Send');
 				} else {
-					$('#bds-pwr-btn').text('Startup');
+					$('#bds-pwr-btn').text('Start Server');
 					$('#bds-pwr-btn').addClass('btn-success');
 					if ($('#bds-pwr-btn').hasClass('btn-danger')) {
 						$('#bds-pwr-btn').removeClass('btn-danger');
@@ -113,7 +117,7 @@
 		// BDS power button click
 		$('#bds-pwr-btn').click(function(){
 			$('#bds-pwr-btn').attr('disabled', 'disabled');
-			if ($('#bds-pwr-btn').text() == 'Startup') {
+			if ($('#bds-pwr-btn').text() == 'Start Server') {
 				socket.emit('bds-startup', {data: 'startup'});
 			} else {
 				socket.emit('bds-shutdown', {data: 'shutdown'});
