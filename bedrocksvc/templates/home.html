@@ -1,17 +1,36 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="content-section" id="mainSection">
-	<h4>Bedrock Server Controls</h4>
-	<div class="mb-2">
-		<button id="bds-pwr-btn" class="btn btn-success me-2" type="submit" disabled>Startup</button>
-		<button id="bds-pause-btn" class="btn btn-warning me-2" type="submit" disabled>Pause Refresh</button>
-		Current Version: 0 - Latest Version: 0
-	</div>
-	
-	<div class="mb-2">
-		<!-- <label for="bds-log-text" class="form-label">Bedrock Server Controls</label> -->
-		<textarea id="bds-log-text" class="form-control mb-2" rows="14" disabled></textarea>
-		<input id="bds-send-input" class="form-control form-control-md mb-2" type="text" placeholder="Send disabled, server not running" disabled>
+	<!-- <h4>Bedrock Server Controls</h4> -->
+	<div class="container">
+		<div class="row">
+			<div class="col-2 me-2 control-btns">
+				<!-- <div class="row mb-2 fs-5 fw-bold">
+					Controls
+				</div> -->
+				<div class="row mb-2">
+					<button id="svc-status-btn" class="btn btn-danger" type="submit" data-action="disconnected" disabled>
+						<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" title="Disconnected..."></span>
+					</button>
+				</div>
+				<div class="row mb-2">
+					<button id="bds-pwr-btn" class="btn btn-success" type="submit" disabled>Startup</button>
+				</div>
+				<div class="row mb-2">
+					<button id="bds-update-btn" class="btn btn-primary" type="submit" disabled>Check for update</button>
+				</div>
+			</div>
+			<div class="col">
+				<!-- <div class="row mb-2 fs-5 fw-bold">
+					Log
+				</div> -->
+				<div class="row mb-2">
+					<!-- <label for="bds-log-text" class="form-label">Bedrock Server Controls</label> -->
+					<textarea id="bds-log-text" class="form-control mb-2" rows="14" disabled></textarea>
+					<input id="bds-send-input" class="form-control form-control-md mb-2" type="text" placeholder="Send disabled, server not running" disabled>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 {% endblock content %}
@@ -35,11 +54,25 @@
 			}, 5000)
 		});
 
-		// Send connected msg to socket server
+		// On client socket connect
 		socket.on('connect', function() {
 			$('#bds-log-text').empty();
 			socket.emit('admin-connect', {data: 'Admin connected!'});
-				$('#bds-pause-btn').removeAttr("disabled");
+			$('#svc-status-btn').html("<img src=\"{{ url_for('static', filename='icons/pause-fill.svg') }}\" title=\"Stop Status Refreshing\">");
+			$('.control-btns button').removeAttr("disabled");
+			$('#svc-status-btn').attr('data-action', 'pause');
+			$('#svc-status-btn').removeClass('btn-danger');
+			$('#svc-status-btn').addClass('btn-success');
+		});
+		
+		// On client socket disconnect
+		socket.on('disconnect', function() {
+			$('#svc-status-btn').html("<span class=\"spinner-border spinner-border-sm\" role=\"status\" aria-hidden=\"true\" title=\"Disconnected...\"></span>");
+			$('.control-btns button').attr('disabled', 'disabled');
+			$('#svc-status-btn').attr('data-action', 'disconnected');
+			$('#svc-status-btn').removeClass('btn-success');
+			$('#svc-status-btn').removeClass('btn-warning');
+			$('#svc-status-btn').addClass('btn-danger');
 		});
 
 		// BDS status + power button status
@@ -87,14 +120,20 @@
 			}
 		});
 
-		// BDS status pause button click
-		$('#bds-pause-btn').click(function(){
-			if ($('#bds-pause-btn').text() == 'Pause Refresh') {
+		// SVC status pause button click
+		$('#svc-status-btn').click(function(){
+			if ($('#svc-status-btn').attr('data-action') == 'pause') {
 				bds_status_refresh = false
-				$('#bds-pause-btn').text('Unpause Refresh');
+				$('#svc-status-btn').html("<img src=\"{{ url_for('static', filename='icons/play-fill.svg') }}\" title=\"Start Status Refreshing\">");
+				$('#svc-status-btn').attr('data-action', 'play');
+				$('#svc-status-btn').removeClass('btn-success');
+				$('#svc-status-btn').addClass('btn-warning');
 			} else {
 				bds_status_refresh = true
-				$('#bds-pause-btn').text('Pause Refresh');
+				$('#svc-status-btn').html("<img src=\"{{ url_for('static', filename='icons/pause-fill.svg') }}\" title=\"Stop Status Refreshing\">");
+				$('#svc-status-btn').attr('data-action', 'pause');
+				$('#svc-status-btn').removeClass('btn-warning');
+				$('#svc-status-btn').addClass('btn-success');
 			}
 		});
 
