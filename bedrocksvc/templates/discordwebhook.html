@@ -1,0 +1,185 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="content-section">
+	<legend class="border-bottom mb-4">Discord Webhooks</legend>
+	{% if action == 'new' %}
+		<div class="list-group mb-4">
+			{% for webhook in webhooks %}
+				<a href="discordwebhook/{{ webhook.id }}" class="list-group-item list-group-item-action">{{ webhook.name }} {% if webhook.enabled == False %}<span class="text-muted fst-italic ms-1">Disabled</span>{% endif %}</a>
+			{% endfor %}
+		</div>
+		<button class="btn btn-primary mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#webhook-form">
+			New Webhook
+		</button>
+	{% endif %}
+	<div {% if action == 'new' %}class="collapse"{% endif %} id="webhook-form">
+		<form method="POST" action="">
+			{{ form.hidden_tag() }}
+			<fieldset class="form-group">
+				<div class="form-group mb-2">
+					{{ form.name.label(class="form-control-label") }}
+					{% if form.name.errors %}
+						{{ form.name(class="form-control is-invalid") }}
+						<div class="invalid-feedback">
+							{% for error in form.name.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else %}
+						{% if action == 'edit' %}
+							{{ form.name(class="form-control", value=webhook.name) }}
+						{% else %}
+							{{ form.name(class="form-control") }}
+						{% endif %}
+					{% endif %}
+				</div>
+				<div class="form-group mb-2">
+					{{ form.webhook.label(class="form-control-label") }}
+					{% if form.webhook.errors %}
+						{{ form.webhook(class="form-control is-invalid") }}
+						<div class="invalid-feedback">
+							{% for error in form.webhook.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else %}
+						{% if action == 'edit' %}
+							{{ form.webhook(class="form-control", value=webhook.webhook) }}
+						{% else %}
+							{{ form.webhook(class="form-control") }}
+						{% endif %}
+					{% endif %}
+				</div>
+				<div class="form-check form-switch mb-2">
+					{{ form.enabled.label(class="form-check-label") }}
+					{% if form.enabled.errors %}
+						{{ form.enabled(class="form-control is-invalid") }}
+						<div class="invalid-feedback">
+							{% for error in form.enabled.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else %}
+						<input class="form-check-input" id="enabled" name="enabled" type="checkbox" {% if action == 'edit' %}{% if webhook.enabled == True %}checked{% endif %}{% endif %}>
+					{% endif %}
+				</div>
+				<div class="form-check form-switch mb-2">
+					{{ form.announce_player_connect.label(class="form-check-label") }}
+					{% if form.announce_player_connect.errors %}
+						{{ form.announce_player_connect(class="form-control is-invalid") }}
+						<div class="invalid-feedback">
+							{% for error in form.announce_player_connect.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else %}
+						<input class="form-check-input" id="announce_player_connect" name="announce_player_connect" type="checkbox" {% if action == 'edit' %}{% if webhook.announce_player_connect == True %}checked{% endif %}{% endif %}>
+					{% endif %}
+				</div>
+				<div class="form-check form-switch mb-2">
+					{{ form.announce_player_disconnect.label(class="form-check-label") }}
+					{% if form.announce_player_disconnect.errors %}
+						{{ form.announce_player_disconnect(class="form-control is-invalid") }}
+						<div class="invalid-feedback">
+							{% for error in form.announce_player_disconnect.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else %}
+						<input class="form-check-input" id="announce_player_disconnect" name="announce_player_disconnect" type="checkbox" {% if action == 'edit' %}{% if webhook.announce_player_disconnect == True %}checked{% endif %}{% endif %}>
+					{% endif %}
+				</div>
+				<div class="form-group mb-2">
+					{{ form.announce_player_buffer_time.label(class="form-control-label") }}
+					{% if form.announce_player_buffer_time.errors %}
+						{{ form.announce_player_buffer_time(class="form-control is-invalid") }}
+						<div class="invalid-feedback">
+							{% for error in form.announce_player_buffer_time.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else %}
+						{% if action == 'edit' %}
+							{{ form.announce_player_buffer_time(class="form-control", value=webhook.announce_player_buffer_time) }}
+						{% else %}
+							{{ form.announce_player_buffer_time(class="form-control") }}
+						{% endif %}
+					{% endif %}
+					<div id="announce_player_buffer_time_help" class="form-text">Increase this time to avoid repeat announcements when players disconnect and reconnect in quick succession.</div>
+				</div>
+				<div class="form-check form-switch mb-2">
+					{{ form.announce_server_start.label(class="form-check-label") }}
+					{% if form.announce_server_start.errors %}
+						{{ form.announce_server_start(class="form-control is-invalid") }}
+						<div class="invalid-feedback">
+							{% for error in form.announce_server_start.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else %}
+						<input class="form-check-input" id="announce_server_start" name="announce_server_start" type="checkbox" {% if action == 'edit' %}{% if webhook.announce_server_start == True %}checked{% endif %}{% endif %}>
+					{% endif %}
+				</div>
+				<div class="form-check form-switch mb-2">
+					{{ form.announce_server_shutdown.label(class="form-check-label") }}
+					{% if form.announce_server_shutdown.errors %}
+						{{ form.announce_server_shutdown(class="form-control is-invalid") }}
+						<div class="invalid-feedback">
+							{% for error in form.announce_server_shutdown.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else %}
+						<input class="form-check-input" id="announce_server_shutdown" name="announce_server_shutdown" type="checkbox" {% if action == 'edit' %}{% if webhook.announce_server_shutdown == True %}checked{% endif %}{% endif %}>
+					{% endif %}
+				</div>
+				<div class="form-check form-switch mb-2">
+					{{ form.announce_update_success.label(class="form-check-label") }}
+					{% if form.announce_update_success.errors %}
+						{{ form.announce_update_success(class="form-control is-invalid") }}
+						<div class="invalid-feedback">
+							{% for error in form.announce_update_success.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else %}
+						<input class="form-check-input" id="announce_update_success" name="announce_update_success" type="checkbox" {% if action == 'edit' %}{% if webhook.announce_update_success == True %}checked{% endif %}{% endif %}>
+					{% endif %}
+				</div>
+				<div class="form-check form-switch mb-2">
+					{{ form.announce_update_available.label(class="form-check-label") }}
+					{% if form.announce_update_available.errors %}
+						{{ form.announce_update_available(class="form-control is-invalid") }}
+						<div class="invalid-feedback">
+							{% for error in form.announce_update_available.errors %}
+								<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else %}
+						<input class="form-check-input" id="announce_update_available" name="announce_update_available" type="checkbox" {% if action == 'edit' %}{% if webhook.announce_update_available == True %}checked{% endif %}{% endif %}>
+					{% endif %}
+				</div>
+				<div class="form-group mt-3">
+					{% if action == 'new' %}
+						{{ form.submit(class="btn btn-primary") }}
+					{% else %}
+						{{ form.update(class="btn btn-primary me-1") }}
+						<a class="btn btn-secondary me-1" href="/discordwebhook" role="button">Cancel</a>
+						{{ form.delete(class="btn btn-danger float-end") }}
+					{% endif %}
+				</div>
+			</fieldset>
+		</form>
+	</div>
+</div>
+{% endblock content %}
+{% block scripts %}
+<script type="text/javascript" charset="utf-8">
+	// On DOM ready
+	$(document).ready(function(){
+		if ({{ form.errors|length }} > 0) {
+			$('#webhook-form').addClass('show');
+		}
+	});
+</script>
+{% endblock scripts %}

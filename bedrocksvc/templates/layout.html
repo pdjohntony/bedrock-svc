@@ -30,6 +30,8 @@
 						<a class="nav-item nav-link" href="{{ url_for('home') }}">Home</a>
 						<a class="nav-item nav-link" href="{{ url_for('home') }}">Schedule</a>
 						<a class="nav-item nav-link" href="{{ url_for('home') }}">Database</a>
+						<a class="nav-item nav-link" href="{{ url_for('discord_webhooks') }}">Discord Webhooks</a>
+						<a class="nav-item nav-link" href="{{ url_for('home') }}">Config</a>
 					</div>
 					<div class="navbar-nav">
 						{% if current_user.is_authenticated %}

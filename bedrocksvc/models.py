@@ -33,3 +33,19 @@ class PlayerEvent(db.Model):
 
 	def __repr__(self):
 		return f"PlayerEvent('{self.date}', '{self.player_id}', '{self.event}')"
+
+class DiscordWebhook(db.Model):
+	id                          = db.Column(db.Integer, primary_key=True)
+	name                        = db.Column(db.String(120), nullable=False)
+	webhook                     = db.Column(db.String, nullable=False)
+	enabled                     = db.Column(db.Boolean(), nullable=False)
+	announce_player_connect     = db.Column(db.Boolean(), nullable=False)
+	announce_player_disconnect  = db.Column(db.Boolean(), nullable=False)
+	announce_player_buffer_time = db.Column(db.Integer, nullable=False)
+	announce_server_start       = db.Column(db.Boolean(), nullable=False)
+	announce_server_shutdown    = db.Column(db.Boolean(), nullable=False)
+	announce_update_success     = db.Column(db.Boolean(), nullable=False)
+	announce_update_available   = db.Column(db.Boolean(), nullable=False)
+
+	def __repr__(self):
+		return f"DiscordWebhook('{self.name}', '{self.webhook}')"

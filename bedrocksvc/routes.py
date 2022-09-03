@@ -2,8 +2,8 @@ import logging
 from flask import url_for, render_template, flash, redirect, request, session
 from flask_login import login_user, current_user, logout_user, login_required
 from bedrocksvc import app, db, bcrypt, crypt, session_data, BDSServer
-from bedrocksvc.models import User, Player, PlayerEvent
-from bedrocksvc.forms import RegistrationForm, LoginForm
+from bedrocksvc.models import User, Player, PlayerEvent, DiscordWebhook
+from bedrocksvc.forms import RegistrationForm, LoginForm, DiscordWebhookForm
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +33,10 @@ def register():
 		flash('Your account has been created!', 'success')
 		logger.info(f"Account '{form.username.data}' has been created!")
 		return redirect(url_for('login'))
+	else:
+		for field, error in form.errors.items():
+			logger.error(f"Form invalid: {field.capitalize()}: {error}")
+			flash(f'{field.capitalize()}: {error[0]}', 'danger')
 	return render_template('register.html', title='Register', form=form)
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -61,12 +65,6 @@ def logout():
 	logout_user()
 	return redirect(url_for('login'))
 
-# def shutdown_server():
-# 	func = request.environ.get('werkzeug.server.shutdown')
-# 	if func is None:
-# 		raise RuntimeError('Not running with the Werkzeug Server')
-# 	func()
-
 @app.route("/startup")
 @login_required
 def startup():
@@ -88,3 +86,76 @@ def shutdown():
 	BDSServer.stop_server()
 	flash('Bedrock server shutdown!', 'success')
 	return redirect(url_for('home'))
+
+@app.route("/discordwebhook", methods=['GET', 'POST'])
+@login_required
+def discord_webhooks():
+	webhooks = DiscordWebhook.query.all()
+	form     = DiscordWebhookForm()
+
+	if form.validate_on_submit():
+		new_webhook = DiscordWebhook(
+			name                        = form.name.data,
+			webhook                     = form.webhook.data,
+			enabled                     = form.enabled.data,
+			announce_player_connect     = form.announce_player_connect.data,
+			announce_player_disconnect  = form.announce_player_disconnect.data,
+			announce_player_buffer_time = form.announce_player_buffer_time.data,
+			announce_server_start       = form.announce_server_start.data,
+			announce_server_shutdown    = form.announce_server_shutdown.data,
+			announce_update_success     = form.announce_update_success.data,
+			announce_update_available   = form.announce_update_available.data
+		)
+		db.session.add(new_webhook)
+		db.session.commit()
+		flash('Discord Webhook created!', 'success')
+		logger.info(f"Discord Webhook '{form.name.data}' has been created!")
+		return redirect(url_for("discord_webhooks"))
+	else:
+		for field, error in form.errors.items():
+			logger.error(f"Form invalid: {field.capitalize()}: {error}")
+			flash(f'{field.capitalize()}: {error[0]}', 'danger')
+	return render_template('discordwebhook.html', title='Discord Webhooks', form=form, webhooks=webhooks, action='new')
+
+@app.route("/discordwebhook/<int:id>", methods=['GET', 'POST'])
+@login_required
+def discord_webhook(id):
+	webhook = DiscordWebhook.query.get_or_404(id)
+	form    = DiscordWebhookForm()
+
+	if form.validate_on_submit():
+		if form.delete.data == True:
+			db.session.delete(webhook)
+			db.session.commit()
+			logger.info(f"Discord Webhook '{webhook.name}' deleted")
+			flash(f"Discord Webhook '{webhook.name}' deleted", "success")
+			return redirect(url_for("discord_webhooks"))
+		webhook.name                        = form.name.data
+		webhook.webhook                     = form.webhook.data
+		webhook.enabled                     = form.enabled.data
+		webhook.announce_player_connect     = form.announce_player_connect.data
+		webhook.announce_player_disconnect  = form.announce_player_disconnect.data
+		webhook.announce_player_buffer_time = form.announce_player_buffer_time.data
+		webhook.announce_server_start       = form.announce_server_start.data
+		webhook.announce_server_shutdown    = form.announce_server_shutdown.data
+		webhook.announce_update_success     = form.announce_update_success.data
+		webhook.announce_update_available   = form.announce_update_available.data
+		db.session.commit()
+		flash('Discord Webhook updated!', 'success')
+		logger.info(f"Discord Webhook '{form.name.data}' has been updated!")
+		return redirect(url_for("discord_webhooks"))
+	else:
+		for field, error in form.errors.items():
+			logger.error(f"Form invalid: {field.capitalize()}: {error}")
+			flash(f'{field.capitalize()}: {error[0]}', 'danger')
+	return render_template('discordwebhook.html', title='Discord Webhooks', form=form, webhook=webhook, action='edit')
+	form = DiscordWebhookForm()
+	if len(DiscordWebhook.query.all()) > 0:
+		pass
+	if form.validate_on_submit():
+		dwh = User(username=form.username.data, email=form.email.data)
+		db.session.add(dwh)
+		db.session.commit()
+		flash('Discord Webhook created!', 'success')
+		logger.info(f"Discord Webhook '{form.name.data}' has been created!")
+	return render_template('discordwebhook.html', title='Discord Webhook', form=form)

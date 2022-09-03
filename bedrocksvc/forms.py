@@ -1,7 +1,7 @@
 import logging
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SelectField, BooleanField, SubmitField
-from wtforms.validators import DataRequired, Length, EqualTo, Email, ValidationError
+from wtforms import StringField, PasswordField, SelectField, BooleanField, SubmitField, IntegerField
+from wtforms.validators import DataRequired, InputRequired, Length, EqualTo, Email, ValidationError, URL, NumberRange
 from bedrocksvc.models import User
 
 logger = logging.getLogger(__name__)
@@ -28,3 +28,19 @@ class LoginForm(FlaskForm):
 	password = PasswordField('Password', validators=[DataRequired()])
 	remember = BooleanField('Remember Me')
 	submit   = SubmitField('Login')
+
+class DiscordWebhookForm(FlaskForm):
+	# id                          = IntegerField('id', validators=[DataRequired()])
+	name                        = StringField('Name', validators=[DataRequired(), Length(min=1, max=120)])
+	webhook                     = StringField('Webhook', validators=[DataRequired(), URL()])
+	enabled                     = BooleanField('Enable', validators=[])
+	announce_player_connect     = BooleanField('Announce Player Connect', validators=[])
+	announce_player_disconnect  = BooleanField('Announce Player Disconnect', validators=[])
+	announce_player_buffer_time = IntegerField('Announce Player Buffer Time', validators=[InputRequired(), NumberRange(min=0, max=600)], default=0)
+	announce_server_start       = BooleanField('Announce Server Start', validators=[])
+	announce_server_shutdown    = BooleanField('Announce Server Shutdown', validators=[])
+	announce_update_success     = BooleanField('Announce Update Success', validators=[])
+	announce_update_available   = BooleanField('Announce Update Available', validators=[])
+	submit                      = SubmitField('Save')
+	update                      = SubmitField('Update')
+	delete                      = SubmitField('Delete')

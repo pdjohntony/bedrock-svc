@@ -107,6 +107,14 @@ body {
 	max-width: 100%;
 }
 
+.list-group-item {
+	background-color: #292929;
+}
+
+.list-group-item:hover {
+	background-color: #333333;
+}
+
 /* table {
 	border-collapse: separate;
 	border-spacing: 25px 2px;
